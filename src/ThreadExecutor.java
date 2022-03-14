@@ -18,6 +18,8 @@
 //
 //*********************************************************************
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,13 +45,15 @@ public class ThreadExecutor {
 		obj.printInstructions();
 		
 		ExecutorService pool = Executors.newFixedThreadPool(2); // sorting threads
-		int count;
+		int count; // number of integers to process
 		
 		/* Continue to perform calculations until 
 		 * the user enters a 0 to quit.*/
 		do {
 			count = obj.getCount();
 			System.out.println("RECIEVED: " + count);
+			List<Integer> intList = obj.getRandomIntList(count);
+			System.out.println(intList);
 			
 		} while(count > 0);
 		
@@ -99,16 +103,13 @@ public class ThreadExecutor {
 	
     //***************************************************************
     //
-    //  Method:       getValues (Non Static)
+    //  Method:       getCount (Non Static)
     // 
-    //  Description:  Attempts to get a list of values from the user.
-    //                If the user enters a non-sentinel value (not 0) 
-    //                the input will be forwarded for processing along
-    //                with a reference to a list to populate.
-    // 
-    //  Parameters:   List<Integer>
+    //  Description:  Attempts to get an integer count from the user
+	//
+    //  Parameters:   None
     //
-    //  Returns:      boolean 
+    //  Returns:      int (count)
     //
     //***************************************************************
 	public int getCount() {
@@ -136,6 +137,25 @@ public class ThreadExecutor {
 		return count;
 	
 	}//end getCount method
+	
+	public List<Integer> getRandomIntList(int count) {
+		
+		List<Integer> randomInts = new ArrayList<Integer>();
+		if(count > 0) {
+			
+			for(int i = 0; i < count; i++) {
+				randomInts.add(getRandomInt());
+			}
+		}
+		
+		return randomInts;
+
+	}
+	
+	public int getRandomInt() {
+		
+		return (int) (Math.random() * 100);
+	}
 	
     //***************************************************************
     //
