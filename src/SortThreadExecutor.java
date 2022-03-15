@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
 	
 public class SortThreadExecutor {
 	
@@ -248,17 +249,22 @@ public class SortThreadExecutor {
 	    	rightHalf[i - mid] = unsortedArray[i];
 	    }
 	    
-	    // divide sorting and merging among separate threads
-	    Future<int[]> sortedLeft = pool.submit(new SortTask(leftHalf));
-	    Future<int[]> sortedRight = pool.submit(new SortTask(rightHalf));
-	    Future<int[]> merged = pool.submit(new MergeTask(sortedLeft, sortedRight));
 	    int[] results = null; // to hold results
-	    
-		try { // attempts to get array from Future object
-			results = merged.get();
-		} catch (InterruptedException | ExecutionException e) {
+	    try {
+	    	
+		    // divide sorting and merging among separate threads
+		    Future<int[]> sortedLeft = pool.submit(new SortTask(leftHalf));
+		    Future<int[]> sortedRight = pool.submit(new SortTask(rightHalf));
+		    Future<int[]> merged = pool.submit(new MergeTask(sortedLeft, sortedRight));
+		    results = merged.get();
+		    
+	    } catch (RejectedExecutionException | NullPointerException e) {
+	    	
+	    	e.getMessage(); // to catch submit exceptions
+	    	
+	    } catch (InterruptedException | ExecutionException e) {
 
-			e.printStackTrace();
+			e.printStackTrace(); // to catch merged.get() exceptions
 		}
 	    
 	    return results;

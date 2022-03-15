@@ -91,29 +91,28 @@ public class SortTask implements Callable <int[]> {
     //  Returns:      N/A 
     //
     //***************************************************************
-	public static void merge(
-			  int[] targetArr, int[] leftArr, int[] rightArr, int leftArrLen, int rightArrLen) {
-			 
-			    int i = 0; // left array index
-			    int j = 0; // right array index
-			    int k = 0; // target array index
-			    
-			    while (i < leftArrLen && j < rightArrLen) { // while left and right still both have elements to compare 
-			        if (leftArr[i] <= rightArr[j]) { // if left element is smaller right
-			        	targetArr[k++] = leftArr[i++]; // set as current element in target array, increment
-			        }
-			        else {
-			        	targetArr[k++] = rightArr[j++]; // set right element as current element in target array, increment
-			        }
-			    }
-			    
-			    while (i < leftArrLen) { // right array finished, iterate through left array
-			    	targetArr[k++] = leftArr[i++]; // set current left element as current in target array, increment
-			    }
-			   
-			    while (j < rightArrLen) { // left array finished, iterate through right array
-			    	targetArr[k++] = rightArr[j++]; // set current right element as current in target array, increment
-			    }
+	public static void merge(int[] targetArr, int[] leftArr, int[] rightArr, int leftArrLen, int rightArrLen) {
+	 
+		int i = 0; // left array index
+	    int j = 0; // right array index
+	    int k = 0; // target array index
+	    
+	    while (i < leftArrLen && j < rightArrLen) { // while left and right still both have elements to compare 
+	        if (leftArr[i] <= rightArr[j]) { // if left element is smaller right
+	        	targetArr[k++] = leftArr[i++]; // set as current element in target array, increment
+	        }
+	        else {
+	        	targetArr[k++] = rightArr[j++]; // set right element as current element in target array, increment
+	        }
+	    }
+	    
+	    while (i < leftArrLen) { // right array finished, iterate through left array
+	    	targetArr[k++] = leftArr[i++]; // set current left element as current in target array, increment
+	    }
+	   
+	    while (j < rightArrLen) { // left array finished, iterate through right array
+	    	targetArr[k++] = rightArr[j++]; // set current right element as current in target array, increment
+	    }
 			    
 	}// end merge method
 
