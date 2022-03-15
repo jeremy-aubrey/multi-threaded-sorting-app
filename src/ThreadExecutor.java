@@ -18,13 +18,15 @@
 //
 //*********************************************************************
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
+import java.util.concurrent.Future;
+import java.util.stream.IntStream;
+	
 public class ThreadExecutor {
+	
 	private Scanner userIn = new Scanner(System.in);
 	
     //***************************************************************
@@ -44,16 +46,19 @@ public class ThreadExecutor {
 		obj.developerInfo();
 		obj.printInstructions();
 		
-		ExecutorService pool = Executors.newFixedThreadPool(2); // sorting threads
 		int count; // number of integers to process
+		ExecutorService pool = Executors.newFixedThreadPool(3); // fixed at 3
 		
 		/* Continue to perform calculations until 
 		 * the user enters a 0 to quit.*/
 		do {
 			count = obj.getCount();
-			System.out.println("RECIEVED: " + count);
-			List<Integer> intList = obj.getRandomIntList(count);
-			System.out.println(intList);
+			int[] unsortedInts = obj.getRandomArray(count);
+			System.out.print("Unsorted: ");
+			obj.printArray(unsortedInts);
+			int[] sortedInts = obj.sort(unsortedInts, pool);
+			System.out.print("Sorted: ");
+			obj.printArray(sortedInts);
 			
 		} while(count > 0);
 		
@@ -125,7 +130,7 @@ public class ThreadExecutor {
 				if(temp >= 0) { //validate 
 					count = temp;
 				} else {
-					System.out.println("Number must be greater than 0");
+					System.out.println("Number must be between 1 and 99");
 				}
 				
 			} catch (NumberFormatException e) {
@@ -138,23 +143,66 @@ public class ThreadExecutor {
 	
 	}//end getCount method
 	
-	public List<Integer> getRandomIntList(int count) {
+	public int[] getRandomArray(int count) {
 		
-		List<Integer> randomInts = new ArrayList<Integer>();
+		int[] randomArray = new int[count];
 		if(count > 0) {
 			
 			for(int i = 0; i < count; i++) {
-				randomInts.add(getRandomInt());
+				randomArray[i] = getRandomInt();
 			}
 		}
 		
-		return randomInts;
-
+		return randomArray;
 	}
 	
 	public int getRandomInt() {
 		
 		return (int) (Math.random() * 100);
+	}
+	
+	public int[] sort (int[] unsortedArray, ExecutorService pool) {
+		
+		int length = unsortedArray.length;
+		
+	    if (length < 2) {
+	        return unsortedArray;
+	    }
+	    
+	    int mid = length / 2;
+	    int[] leftHalf = new int[mid];
+	    int[] rightHalf = new int[length - mid];
+
+	    for (int i = 0; i < mid; i++) {
+	    	leftHalf[i] = unsortedArray[i];
+	    }
+	    for (int i = mid; i < length; i++) {
+	    	rightHalf[i - mid] = unsortedArray[i];
+	    }
+	    
+	    Future<int[]> sortedLeft = pool.submit(new SortTask(leftHalf));
+	    Future<int[]> sortedRight = pool.submit(new SortTask(rightHalf));
+	    Future<int[]> merged = pool.submit(new MergeTask(sortedLeft, sortedRight));
+	    int[] results = null;
+	    
+		try {
+			results = merged.get();
+		} catch (InterruptedException | ExecutionException e) {
+
+			e.printStackTrace();
+		}
+	    
+	    return results;
+	}
+	
+	public void printArray(int[] arr) {
+		System.out.print("[");
+		if(arr != null) {
+			for(int i : arr ) {
+				System.out.print(" " + i + " ");
+			}
+		} 
+		System.out.print("]\n");
 	}
 	
     //***************************************************************
